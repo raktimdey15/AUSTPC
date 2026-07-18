@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { ReactLenis } from "lenis/react";
 
 import "./index.css";
 import App from "./App";
@@ -12,6 +13,16 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <App />
+    <ReactLenis
+      root
+      options={{
+        duration: 1.2,
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+      }}
+    >
+      <App />
+    </ReactLenis>
   </React.StrictMode>
 );

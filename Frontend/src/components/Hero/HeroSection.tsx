@@ -1,21 +1,44 @@
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import PrimaryButton from "../Common/PrimaryButton";
+import slide1 from "../../assets/images/1.jpg";
+import slide2 from "../../assets/images/2.jpg";
+import slide3 from "../../assets/images/3.jpg";
+
+const slides = [slide1, slide2, slide3];
 
 export default function HeroSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 2000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative isolate overflow-hidden bg-black">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,255,102,0.14),transparent_35%),linear-gradient(120deg,rgba(255,255,255,0.04),transparent)]" />
-      <img
-        src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1800&q=80"
-        alt="Photography club event"
-        className="absolute inset-0 h-full w-full object-cover opacity-40"
-      />
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={slides[activeIndex]}
+          src={slides[activeIndex]}
+          alt="Photography club event"
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 0.7, scale: 1 }}
+          exit={{ opacity: 0, scale: 1.04 }}
+          transition={{ duration: 2, ease: "easeInOut" }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </AnimatePresence>
       <div className="absolute inset-0 bg-black/70" />
       <div className="relative mx-auto flex min-h-[90vh] max-w-7xl items-center px-4 py-24 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 2, ease: "easeInOut" }}
           className="max-w-3xl"
         >
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#00FF66]">AUST Photography Club</p>
@@ -26,10 +49,14 @@ export default function HeroSection() {
             Explore exhibitions, workshops, and a thriving creative community built around photography, design, and visual leadership.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <PrimaryButton to="/events">Explore Events</PrimaryButton>
-            <PrimaryButton to="/join" className="border-white/20 bg-transparent text-white hover:bg-white/10">
-              Join the Club
-            </PrimaryButton>
+            <motion.div whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 1 }}>
+              <PrimaryButton to="/events">Explore Events</PrimaryButton>
+            </motion.div>
+            <motion.div whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 1 }}>
+              <PrimaryButton to="/join" className="border-white/20 bg-transparent text-white hover:bg-white/10">
+                Join the Club
+              </PrimaryButton>
+            </motion.div>
           </div>
         </motion.div>
       </div>

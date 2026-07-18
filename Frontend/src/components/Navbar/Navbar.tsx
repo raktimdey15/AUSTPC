@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
+import logo from "../../assets/icon/austpc.png";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -12,7 +13,6 @@ const navItems = [
   { to: "/upcoming-events", label: "Upcoming Events" },
   { to: "/notice", label: "Notice" },
   { to: "/join", label: "Join" },
-  { to: "/admin", label: "Admin" },
 ];
 
 const hallOfFameItems = [
@@ -23,12 +23,13 @@ const hallOfFameItems = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [hallOfFameOpen, setHallOfFameOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link to="/" className="text-xl font-semibold tracking-[0.3em] text-white">
-          AUSTPC
+        <Link to="/" className="flex items-center transition duration-300 hover:scale-105">
+          <img src={logo} alt="AUSTPC logo" className="h-12 w-auto max-w-[180px] object-contain" />
         </Link>
 
         <button className="rounded-full border border-white/15 p-2 text-white md:hidden" onClick={() => setOpen(!open)}>
@@ -38,14 +39,28 @@ export default function Navbar() {
         <nav className="hidden items-center gap-6 text-sm text-zinc-300 md:flex">
           {navItems.map((item) =>
             item.label === "Hall of Fame" ? (
-              <div key={item.to} className="group relative">
-                <button className="transition hover:text-[#00FF66]">{item.label}</button>
-                <div className="invisible absolute left-0 top-full mt-3 w-40 rounded-2xl border border-white/10 bg-zinc-950/95 p-2 opacity-0 shadow-2xl transition group-hover:visible group-hover:opacity-100">
+              <div
+                key={item.to}
+                className="relative"
+                onMouseEnter={() => setHallOfFameOpen(true)}
+                onMouseLeave={() => setHallOfFameOpen(false)}
+                onFocus={() => setHallOfFameOpen(true)}
+                onBlur={() => setHallOfFameOpen(false)}
+              >
+                <button
+                  type="button"
+                  className="rounded-full px-3 py-2 transition duration-300 hover:bg-white/10 hover:text-[#00FF66]"
+                >
+                  {item.label}
+                </button>
+                <div
+                  className={`absolute left-0 top-full mt-3 w-40 rounded-2xl border border-white/10 bg-zinc-950/95 p-2 shadow-2xl transition duration-300 ${hallOfFameOpen ? "visible opacity-100" : "invisible opacity-0"}`}
+                >
                   {hallOfFameItems.map((subItem) => (
                     <Link
                       key={subItem.to}
                       to={subItem.to}
-                      className="block rounded-xl px-3 py-2 text-sm text-zinc-300 transition hover:bg-white/10 hover:text-[#00FF66]"
+                      className="block rounded-xl px-3 py-2 text-sm text-zinc-300 transition duration-300 hover:bg-white/10 hover:text-[#00FF66]"
                     >
                       {subItem.label}
                     </Link>
@@ -56,8 +71,9 @@ export default function Navbar() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.to === "/"}
                 className={({ isActive }) =>
-                  `transition ${isActive ? "text-[#00FF66]" : "hover:text-[#00FF66]"}`
+                  `rounded-full px-3 py-2 transition duration-300 ${isActive ? "text-[#00FF66]" : "hover:bg-white/10 hover:text-[#00FF66]"}`
                 }
               >
                 {item.label}

@@ -1,19 +1,24 @@
-function App() {
-  return (
-    <div
-      style={{
-        background: "black",
-        color: "lime",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "40px",
-      }}
-    >
-      AUST Photography Club - AUSTPC
-    </div>
-  );
-}
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
-export default App;
+import MainLayout from "./layouts/MainLayout";
+import Home from "./pages/Home/home";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}

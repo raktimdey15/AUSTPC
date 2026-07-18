@@ -1,17 +1,18 @@
 import PageHero from "../../components/Common/PageHero";
-import { executiveMembers } from "../../data/siteContent";
+import { useSiteContent } from "../../context/ContentContext";
 
 export default function Executive() {
+  const { content } = useSiteContent();
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHero
-        eyebrow="Executive Panel"
-        title="A leadership structure built for impact"
-        description="The executive board guides the club’s direction with professionalism, accountability, and a strong creative vision."
+        eyebrow={content.executivePage.eyebrow}
+        title={content.executivePage.title}
+        description={content.executivePage.description}
       />
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {executiveMembers.map((member) => (
+        {content.executiveMembers.map((member) => (
           <div key={member.name} className="overflow-hidden rounded-[24px] border border-white/10 bg-zinc-900/80">
             <img src={member.photo} alt={member.name} className="h-56 w-full object-cover" />
             <div className="p-6">

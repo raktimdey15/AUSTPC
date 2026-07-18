@@ -4,6 +4,7 @@ import { ReactLenis } from "lenis/react";
 
 import "./index.css";
 import App from "./App";
+import { ContentProvider } from "./context/ContentContext";
 
 const root = document.getElementById("root");
 
@@ -22,7 +23,9 @@ ReactDOM.createRoot(root).render(
         touchMultiplier: 2,
       }}
     >
-      <App />
+      <ContentProvider>
+        <App />
+      </ContentProvider>
     </ReactLenis>
   </React.StrictMode>
 );

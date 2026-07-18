@@ -1,17 +1,18 @@
 import PageHero from "../../components/Common/PageHero";
-import { upcomingEvents } from "../../data/siteContent";
+import { useSiteContent } from "../../context/ContentContext";
 
 export default function UpcomingEventsPage() {
+  const { content } = useSiteContent();
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHero
-        eyebrow="Upcoming Events"
-        title="Register early and secure your place"
-        description="Planned gatherings, field sessions, and creative workshops for members and collaborators."
+        eyebrow={content.upcomingEventsPage.eyebrow}
+        title={content.upcomingEventsPage.title}
+        description={content.upcomingEventsPage.description}
       />
 
       <section className="grid gap-6 lg:grid-cols-2">
-        {upcomingEvents.map((event) => (
+        {content.upcomingEventsList.map((event) => (
           <div key={event.title} className="overflow-hidden rounded-[28px] border border-white/10 bg-zinc-900/80">
             <img src={event.poster} alt={event.title} className="h-56 w-full object-cover" />
             <div className="p-6">

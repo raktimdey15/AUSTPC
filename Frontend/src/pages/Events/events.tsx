@@ -1,18 +1,19 @@
 import { useParams } from "react-router-dom";
 import PageHero from "../../components/Common/PageHero";
 import EventCard from "../../components/EventCard/EventCard";
-import { allEvents } from "../../data/siteContent";
+import { useSiteContent } from "../../context/ContentContext";
 
 export default function Events() {
+  const { content } = useSiteContent();
   const { slug } = useParams();
-  const event = allEvents.find((item) => item.slug === slug);
+  const event = content.allEvents.find((item) => item.slug === slug);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHero
         eyebrow="Events"
-        title={event ? event.title : "Curated experiences for every creative passion"}
-        description={event ? event.longDescription : "Discover photography exhibitions, workshops, photowalks, contests, and seminars hosted by the club throughout the year."}
+        title={event ? event.title : content.eventsPage.title}
+        description={event ? event.longDescription : content.eventsPage.description}
       />
 
       {event ? (
@@ -31,7 +32,7 @@ export default function Events() {
       ) : null}
 
       <section className="grid gap-6 md:grid-cols-2">
-        {allEvents.map((eventItem) => (
+        {content.allEvents.map((eventItem) => (
           <EventCard key={eventItem.slug} {...eventItem} />
         ))}
       </section>

@@ -41,6 +41,13 @@ export interface UpcomingEventItem {
   poster: string;
 }
 
+export interface CollaborationItem {
+  name: string;
+  eventName: string;
+  type: string;
+  logo: string;
+}
+
 export const featuredEvents: EventItem[] = [
   {
     slug: "lens-and-light-exhibition",
@@ -195,5 +202,20 @@ export const upcomingEvents: UpcomingEventItem[] = [
     date: "August 30, 2026",
     venue: "AUST Media Studio",
     poster: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
+  },
+];
+
+export const collaborations: CollaborationItem[] = [
+  {
+    name: "AUST Media Lab",
+    eventName: "Studio Stories Workshop",
+    type: "Workshop Partner",
+    logo: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=500&q=80",
+  },
+  {
+    name: "Dhaka Design Collective",
+    eventName: "Frame Forward Seminar",
+    type: "Creative Collaboration",
+    logo: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=500&q=80",
   },
 ];

@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PrimaryButton from "../Common/PrimaryButton";
-import slide1 from "../../assets/images/1.jpg";
-import slide2 from "../../assets/images/2.jpg";
-import slide3 from "../../assets/images/3.jpg";
-
-const slides = [slide1, slide2, slide3];
+import { useSiteContent } from "../../context/ContentContext";
 
 export default function HeroSection() {
+  const { content } = useSiteContent();
   const [activeIndex, setActiveIndex] = useState(0);
+  const slides = content.hero.slides;
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -41,20 +39,20 @@ export default function HeroSection() {
           transition={{ duration: 2, ease: "easeInOut" }}
           className="max-w-3xl"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#00FF66]">AUST Photography Club</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#00FF66]">{content.hero.eyebrow}</p>
           <h1 className="mt-5 text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-7xl">
-            Where stories become timeless frames.
+            {content.hero.title}
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
-            Explore exhibitions, workshops, and a thriving creative community built around photography, design, and visual leadership.
+            {content.hero.subtitle}
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <motion.div whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 1 }}>
-              <PrimaryButton to="/events">Explore Events</PrimaryButton>
+              <PrimaryButton to="/events">{content.hero.primaryButtonLabel}</PrimaryButton>
             </motion.div>
             <motion.div whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 1 }}>
               <PrimaryButton to="/join" className="border-white/20 bg-transparent text-white hover:bg-white/10">
-                Join the Club
+                {content.hero.secondaryButtonLabel}
               </PrimaryButton>
             </motion.div>
           </div>

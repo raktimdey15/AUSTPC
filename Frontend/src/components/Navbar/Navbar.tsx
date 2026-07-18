@@ -49,7 +49,7 @@ export default function Navbar() {
               >
                 <button
                   type="button"
-                  className="rounded-full px-3 py-2 transition duration-300 hover:bg-white/10 hover:text-[#00FF66]"
+                  className="rounded-full px-3 py-2 text-zinc-300 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#00FF66]/10 hover:text-[#00FF66] hover:shadow-[0_0_20px_rgba(0,255,102,0.18)]"
                 >
                   {item.label}
                 </button>
@@ -60,7 +60,7 @@ export default function Navbar() {
                     <Link
                       key={subItem.to}
                       to={subItem.to}
-                      className="block rounded-xl px-3 py-2 text-sm text-zinc-300 transition duration-300 hover:bg-white/10 hover:text-[#00FF66]"
+                      className="block rounded-xl px-3 py-2 text-sm text-zinc-300 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#00FF66]/10 hover:text-[#00FF66] hover:shadow-[0_0_12px_rgba(0,255,102,0.12)]"
                     >
                       {subItem.label}
                     </Link>
@@ -73,7 +73,7 @@ export default function Navbar() {
                 to={item.to}
                 end={item.to === "/"}
                 className={({ isActive }) =>
-                  `rounded-full px-3 py-2 transition duration-300 ${isActive ? "text-[#00FF66]" : "hover:bg-white/10 hover:text-[#00FF66]"}`
+                  `rounded-full px-3 py-2 transition-all duration-300 ${isActive ? "bg-[#00FF66]/10 text-[#00FF66] shadow-[0_0_18px_rgba(0,255,102,0.16)]" : "text-zinc-300 hover:-translate-y-0.5 hover:bg-[#00FF66]/10 hover:text-[#00FF66] hover:shadow-[0_0_16px_rgba(0,255,102,0.12)]"}`
                 }
               >
                 {item.label}

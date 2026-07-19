@@ -1,4 +1,5 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import PageHero from "../../components/Common/PageHero";
 import { useSiteContent, type Applicant } from "../../context/ContentContext";
 import type { CollaborationItem, EventItem, Member, NoticeItem, Semester, UpcomingEventItem } from "../../data/siteContent";
@@ -111,7 +112,8 @@ function MemberEditor({ member, onChange, onRemove }: { member: Member; onChange
 
 export default function AdminPage() {
   const { content, setContent, addApplication } = useSiteContent();
-  const [activeTab, setActiveTab] = useState<"content" | "applications">("content");
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "events" | "executive" | "subExecutive" | "hallOfFame" | "notices" | "applications">("home");
   const [applicationForm, setApplicationForm] = useState({
     name: "",
     department: "",
@@ -215,6 +217,7 @@ export default function AdminPage() {
       year: "2026",
       description: "Describe this semester.",
       members: [],
+      panelists: [],
     };
     setContent((prev) => ({ ...prev, hallOfFameSemesters: [...prev.hallOfFameSemesters, newSemester] }));
   };
@@ -258,6 +261,12 @@ export default function AdminPage() {
     setApplicationForm({ name: "", department: "", email: "", semester: "", phone: "", skills: "" });
   };
 
+  useEffect(() => {
+    if (sessionStorage.getItem("austpc-admin-auth") !== "true") {
+      navigate("/admin");
+    }
+  }, [navigate]);
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <PageHero
@@ -267,15 +276,33 @@ export default function AdminPage() {
       />
 
       <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={() => setActiveTab("content")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "content" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
-          Content Editor
+        <button type="button" onClick={() => setActiveTab("home")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "home" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Home
+        </button>
+        <button type="button" onClick={() => setActiveTab("about")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "about" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          About
+        </button>
+        <button type="button" onClick={() => setActiveTab("events")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "events" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Events
+        </button>
+        <button type="button" onClick={() => setActiveTab("executive")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "executive" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Executive
+        </button>
+        <button type="button" onClick={() => setActiveTab("subExecutive")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "subExecutive" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Sub Executive
+        </button>
+        <button type="button" onClick={() => setActiveTab("hallOfFame")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "hallOfFame" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Hall of Fame
+        </button>
+        <button type="button" onClick={() => setActiveTab("notices")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "notices" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
+          Notices
         </button>
         <button type="button" onClick={() => setActiveTab("applications")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === "applications" ? "bg-[#00FF66] text-black" : "border border-white/10 bg-zinc-900 text-zinc-300"}`}>
           Applications ({content.applications.length})
         </button>
       </div>
 
-      {activeTab === "content" ? (
+      {activeTab === "home" ? (
         <div className="flex flex-col gap-8">
           <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
             <h2 className="text-2xl font-semibold text-white">Hero Segment</h2>
@@ -303,7 +330,7 @@ export default function AdminPage() {
           </section>
 
           <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
-            <h2 className="text-2xl font-semibold text-white">Home Page Content</h2>
+            <h2 className="text-2xl font-semibold text-white">Hero & Homepage Content</h2>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <Field label="About Title" value={content.home.aboutTitle} onChange={(value) => updateHomeField("aboutTitle", value)} />
               <Field label="About Primary Button" value={content.home.aboutPrimaryButtonLabel} onChange={(value) => updateHomeField("aboutPrimaryButtonLabel", value)} />
@@ -332,52 +359,6 @@ export default function AdminPage() {
               </div>
               <div className="md:col-span-2">
                 <TextAreaField label="Executive Description" value={content.home.executiveDescription} onChange={(value) => updateHomeField("executiveDescription", value)} />
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
-            <h2 className="text-2xl font-semibold text-white">Page Metadata</h2>
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <Field label="About Eyebrow" value={content.about.eyebrow} onChange={(value) => updatePageField("about", "eyebrow", value)} />
-              <Field label="About Title" value={content.about.title} onChange={(value) => updatePageField("about", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="About Description" value={content.about.description} onChange={(value) => updatePageField("about", "description", value)} />
-              </div>
-              <Field label="Events Eyebrow" value={content.eventsPage.eyebrow} onChange={(value) => updatePageField("eventsPage", "eyebrow", value)} />
-              <Field label="Events Title" value={content.eventsPage.title} onChange={(value) => updatePageField("eventsPage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Events Description" value={content.eventsPage.description} onChange={(value) => updatePageField("eventsPage", "description", value)} />
-              </div>
-              <Field label="Executive Eyebrow" value={content.executivePage.eyebrow} onChange={(value) => updatePageField("executivePage", "eyebrow", value)} />
-              <Field label="Executive Title" value={content.executivePage.title} onChange={(value) => updatePageField("executivePage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Executive Description" value={content.executivePage.description} onChange={(value) => updatePageField("executivePage", "description", value)} />
-              </div>
-              <Field label="Sub Executive Eyebrow" value={content.subExecutivePage.eyebrow} onChange={(value) => updatePageField("subExecutivePage", "eyebrow", value)} />
-              <Field label="Sub Executive Title" value={content.subExecutivePage.title} onChange={(value) => updatePageField("subExecutivePage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Sub Executive Description" value={content.subExecutivePage.description} onChange={(value) => updatePageField("subExecutivePage", "description", value)} />
-              </div>
-              <Field label="Hall of Fame Eyebrow" value={content.hallOfFamePage.eyebrow} onChange={(value) => updatePageField("hallOfFamePage", "eyebrow", value)} />
-              <Field label="Hall of Fame Title" value={content.hallOfFamePage.title} onChange={(value) => updatePageField("hallOfFamePage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Hall of Fame Description" value={content.hallOfFamePage.description} onChange={(value) => updatePageField("hallOfFamePage", "description", value)} />
-              </div>
-              <Field label="Upcoming Eyebrow" value={content.upcomingEventsPage.eyebrow} onChange={(value) => updatePageField("upcomingEventsPage", "eyebrow", value)} />
-              <Field label="Upcoming Title" value={content.upcomingEventsPage.title} onChange={(value) => updatePageField("upcomingEventsPage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Upcoming Description" value={content.upcomingEventsPage.description} onChange={(value) => updatePageField("upcomingEventsPage", "description", value)} />
-              </div>
-              <Field label="Notice Eyebrow" value={content.noticePage.eyebrow} onChange={(value) => updatePageField("noticePage", "eyebrow", value)} />
-              <Field label="Notice Title" value={content.noticePage.title} onChange={(value) => updatePageField("noticePage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Notice Description" value={content.noticePage.description} onChange={(value) => updatePageField("noticePage", "description", value)} />
-              </div>
-              <Field label="Join Eyebrow" value={content.joinPage.eyebrow} onChange={(value) => updatePageField("joinPage", "eyebrow", value)} />
-              <Field label="Join Title" value={content.joinPage.title} onChange={(value) => updatePageField("joinPage", "title", value)} />
-              <div className="md:col-span-2">
-                <TextAreaField label="Join Description" value={content.joinPage.description} onChange={(value) => updatePageField("joinPage", "description", value)} />
               </div>
             </div>
           </section>
@@ -420,54 +401,6 @@ export default function AdminPage() {
                 </div>
               ))}
               <button type="button" onClick={addGalleryImage} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Gallery Image</button>
-            </div>
-          </section>
-
-          <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
-            <h2 className="text-2xl font-semibold text-white">Events & Programs</h2>
-            <div className="mt-6 space-y-4">
-              {content.featuredEvents.map((event, index) => (
-                <EventEditor key={`${event.slug}-${index}`} event={event} onChange={(updated) => updateEventList("featuredEvents", index, updated)} onRemove={() => removeEvent("featuredEvents", index)} />
-              ))}
-              <button type="button" onClick={() => addEvent("featuredEvents")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Featured Event</button>
-            </div>
-            <div className="mt-8 space-y-4">
-              {content.allEvents.map((event, index) => (
-                <EventEditor key={`${event.slug}-${index}-all`} event={event} onChange={(updated) => updateEventList("allEvents", index, updated)} onRemove={() => removeEvent("allEvents", index)} />
-              ))}
-              <button type="button" onClick={() => addEvent("allEvents")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Event to Calendar</button>
-            </div>
-          </section>
-
-          <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
-            <h2 className="text-2xl font-semibold text-white">Executives, Sub Executives & Hall of Fame</h2>
-            <div className="mt-6 space-y-4">
-              {content.executiveMembers.map((member, index) => (
-                <MemberEditor key={`${member.name}-${index}`} member={member} onChange={(updated) => updateMemberList("executiveMembers", index, updated)} onRemove={() => removeMember("executiveMembers", index)} />
-              ))}
-              <button type="button" onClick={() => addMember("executiveMembers")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Executive Member</button>
-            </div>
-            <div className="mt-8 space-y-4">
-              {content.subExecutiveMembers.map((member, index) => (
-                <MemberEditor key={`${member.name}-${index}-sub`} member={member} onChange={(updated) => updateMemberList("subExecutiveMembers", index, updated)} onRemove={() => removeMember("subExecutiveMembers", index)} />
-              ))}
-              <button type="button" onClick={() => addMember("subExecutiveMembers")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Sub Executive Member</button>
-            </div>
-            <div className="mt-8 space-y-4">
-              {content.hallOfFameSemesters.map((semester, index) => (
-                <div key={`${semester.slug}-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Field label="Slug" value={semester.slug} onChange={(value) => updateSemester(index, "slug", value)} />
-                    <Field label="Title" value={semester.title} onChange={(value) => updateSemester(index, "title", value)} />
-                    <Field label="Year" value={semester.year} onChange={(value) => updateSemester(index, "year", value)} />
-                    <div className="md:col-span-2">
-                      <TextAreaField label="Description" value={semester.description} onChange={(value) => updateSemester(index, "description", value)} />
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => removeSemester(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove</button>
-                </div>
-              ))}
-              <button type="button" onClick={addSemester} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Hall of Fame Semester</button>
             </div>
           </section>
 
@@ -526,6 +459,165 @@ export default function AdminPage() {
             </div>
           </section>
         </div>
+      ) : activeTab === "about" ? (
+        <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+          <h2 className="text-2xl font-semibold text-white">About Page</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <Field label="Eyebrow" value={content.about.eyebrow} onChange={(value) => updatePageField("about", "eyebrow", value)} />
+            <Field label="Title" value={content.about.title} onChange={(value) => updatePageField("about", "title", value)} />
+            <div className="md:col-span-2">
+              <TextAreaField label="Description" value={content.about.description} onChange={(value) => updatePageField("about", "description", value)} />
+            </div>
+          </div>
+        </section>
+      ) : activeTab === "events" ? (
+        <div className="flex flex-col gap-8">
+          <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+            <h2 className="text-2xl font-semibold text-white">Events & Programs</h2>
+            <div className="mt-6 space-y-4">
+              {content.featuredEvents.map((event, index) => (
+                <EventEditor key={`${event.slug}-${index}`} event={event} onChange={(updated) => updateEventList("featuredEvents", index, updated)} onRemove={() => removeEvent("featuredEvents", index)} />
+              ))}
+              <button type="button" onClick={() => addEvent("featuredEvents")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Featured Event</button>
+            </div>
+            <div className="mt-8 space-y-4">
+              {content.allEvents.map((event, index) => (
+                <EventEditor key={`${event.slug}-${index}-all`} event={event} onChange={(updated) => updateEventList("allEvents", index, updated)} onRemove={() => removeEvent("allEvents", index)} />
+              ))}
+              <button type="button" onClick={() => addEvent("allEvents")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Event to Calendar</button>
+            </div>
+          </section>
+        </div>
+      ) : activeTab === "executive" ? (
+        <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+          <h2 className="text-2xl font-semibold text-white">Executive Team</h2>
+          <div className="mt-6 space-y-4">
+            {content.executiveMembers.map((member, index) => (
+              <MemberEditor key={`${member.name}-${index}`} member={member} onChange={(updated) => updateMemberList("executiveMembers", index, updated)} onRemove={() => removeMember("executiveMembers", index)} />
+            ))}
+            <button type="button" onClick={() => addMember("executiveMembers")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Executive Member</button>
+          </div>
+        </section>
+      ) : activeTab === "subExecutive" ? (
+        <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+          <h2 className="text-2xl font-semibold text-white">Sub Executive Team</h2>
+          <div className="mt-6 space-y-4">
+            {content.subExecutiveMembers.map((member, index) => (
+              <MemberEditor key={`${member.name}-${index}-sub`} member={member} onChange={(updated) => updateMemberList("subExecutiveMembers", index, updated)} onRemove={() => removeMember("subExecutiveMembers", index)} />
+            ))}
+            <button type="button" onClick={() => addMember("subExecutiveMembers")} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Sub Executive Member</button>
+          </div>
+        </section>
+      ) : activeTab === "hallOfFame" ? (
+        <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+          <h2 className="text-2xl font-semibold text-white">Hall of Fame & Semester Panelists</h2>
+          <div className="mt-6 space-y-4">
+            {content.hallOfFameSemesters.map((semester, index) => (
+              <div key={`${semester.slug}-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Slug" value={semester.slug} onChange={(value) => updateSemester(index, "slug", value)} />
+                  <Field label="Title" value={semester.title} onChange={(value) => updateSemester(index, "title", value)} />
+                  <Field label="Year" value={semester.year} onChange={(value) => updateSemester(index, "year", value)} />
+                  <div className="md:col-span-2">
+                    <TextAreaField label="Description" value={semester.description} onChange={(value) => updateSemester(index, "description", value)} />
+                  </div>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {semester.panelists.map((panelist, panelIndex) => (
+                    <div key={`${panelist.name}-${panelIndex}`} className="rounded-[20px] border border-white/10 bg-zinc-950/60 p-4">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <Field label="Panelist Name" value={panelist.name} onChange={(value) => {
+                          const next = [...content.hallOfFameSemesters];
+                          next[index] = { ...next[index], panelists: next[index].panelists.map((item, itemIndex) => itemIndex === panelIndex ? { ...item, name: value } : item) };
+                          setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                        }} />
+                        <Field label="Role" value={panelist.role} onChange={(value) => {
+                          const next = [...content.hallOfFameSemesters];
+                          next[index] = { ...next[index], panelists: next[index].panelists.map((item, itemIndex) => itemIndex === panelIndex ? { ...item, role: value } : item) };
+                          setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                        }} />
+                        <Field label="Email" value={panelist.email || ""} onChange={(value) => {
+                          const next = [...content.hallOfFameSemesters];
+                          next[index] = { ...next[index], panelists: next[index].panelists.map((item, itemIndex) => itemIndex === panelIndex ? { ...item, email: value } : item) };
+                          setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                        }} />
+                        <div className="md:col-span-2">
+                          <TextAreaField label="Bio" value={panelist.bio || ""} onChange={(value) => {
+                            const next = [...content.hallOfFameSemesters];
+                            next[index] = { ...next[index], panelists: next[index].panelists.map((item, itemIndex) => itemIndex === panelIndex ? { ...item, bio: value } : item) };
+                            setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                          }} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => {
+                    const next = [...content.hallOfFameSemesters];
+                    next[index] = { ...next[index], panelists: [...next[index].panelists, { name: "New Panelist", role: "Role", email: "", bio: "" }] };
+                    setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                  }} className="mt-4 rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Panelist</button>
+                </div>
+                <button type="button" onClick={() => removeSemester(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove Semester</button>
+              </div>
+            ))}
+            <button type="button" onClick={addSemester} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Hall of Fame Semester</button>
+          </div>
+        </section>
+      ) : activeTab === "notices" ? (
+        <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
+          <h2 className="text-2xl font-semibold text-white">Notices, Upcoming Events & Collaborations</h2>
+          <div className="mt-6 space-y-4">
+            {content.notices.map((notice, index) => (
+              <div key={`${notice.title}-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Title" value={notice.title} onChange={(value) => updateNotice(index, "title", value)} />
+                  <Field label="Date" value={notice.date} onChange={(value) => updateNotice(index, "date", value)} />
+                  <Field label="Attachment" value={notice.attachment} onChange={(value) => updateNotice(index, "attachment", value)} />
+                  <div className="md:col-span-2">
+                    <TextAreaField label="Excerpt" value={notice.excerpt} onChange={(value) => updateNotice(index, "excerpt", value)} />
+                  </div>
+                </div>
+                <button type="button" onClick={() => removeNotice(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={addNotice} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Notice</button>
+          </div>
+          <div className="mt-8 space-y-4">
+            {content.upcomingEventsList.map((event, index) => (
+              <div key={`${event.title}-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Title" value={event.title} onChange={(value) => updateUpcoming(index, "title", value)} />
+                  <Field label="Date" value={event.date} onChange={(value) => updateUpcoming(index, "date", value)} />
+                  <Field label="Venue" value={event.venue} onChange={(value) => updateUpcoming(index, "venue", value)} />
+                  <div className="md:col-span-2">
+                    <TextAreaField label="Description" value={event.description} onChange={(value) => updateUpcoming(index, "description", value)} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <ImageUploadField label="Poster" value={event.poster} onChange={(value) => updateUpcoming(index, "poster", value)} />
+                  </div>
+                </div>
+                <button type="button" onClick={() => removeUpcoming(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={addUpcoming} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Upcoming Event</button>
+          </div>
+          <div className="mt-8 space-y-4">
+            {content.collaborations.map((item, index) => (
+              <div key={`${item.name}-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Name" value={item.name} onChange={(value) => updateCollaboration(index, "name", value)} />
+                  <Field label="Event Name" value={item.eventName} onChange={(value) => updateCollaboration(index, "eventName", value)} />
+                  <Field label="Type" value={item.type} onChange={(value) => updateCollaboration(index, "type", value)} />
+                  <div className="md:col-span-2">
+                    <ImageUploadField label="Logo" value={item.logo} onChange={(value) => updateCollaboration(index, "logo", value)} />
+                  </div>
+                </div>
+                <button type="button" onClick={() => removeCollaboration(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={addCollaboration} className="rounded-full border border-[#00FF66]/30 px-4 py-2 text-sm font-semibold text-[#00FF66]">Add Collaboration</button>
+          </div>
+        </section>
       ) : (
         <section className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-8">
           <h2 className="text-2xl font-semibold text-white">Incoming Applications</h2>

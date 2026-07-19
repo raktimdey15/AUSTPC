@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import type { CollaborationItem, EventItem, Member, NoticeItem, Semester, UpcomingEventItem } from "../data/siteContent";
+import type { CollaborationItem, EventItem, Member, NoticeItem, Panelist, Semester, UpcomingEventItem } from "../data/siteContent";
 import {
   allEvents as initialAllEvents,
   collaborations as initialCollaborations,
@@ -188,7 +188,11 @@ const createInitialState = (): SiteContentState => ({
   allEvents: initialAllEvents.map((item) => ({ ...item })),
   executiveMembers: initialExecutiveMembers.map((item) => ({ ...item })),
   subExecutiveMembers: initialSubExecutiveMembers.map((item) => ({ ...item })),
-  hallOfFameSemesters: initialHallOfFameSemesters.map((item) => ({ ...item, members: item.members.map((member) => ({ ...member })) })),
+  hallOfFameSemesters: initialHallOfFameSemesters.map((item) => ({
+    ...item,
+    members: item.members.map((member) => ({ ...member })),
+    panelists: item.panelists.map((panelist: Panelist) => ({ ...panelist })),
+  })),
   notices: initialNotices.map((item) => ({ ...item })),
   upcomingEventsList: initialUpcomingEvents.map((item) => ({ ...item })),
   collaborations: initialCollaborations.map((item) => ({ ...item })),

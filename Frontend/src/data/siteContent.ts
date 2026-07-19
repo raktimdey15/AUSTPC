@@ -18,12 +18,20 @@ export interface Member {
   linkedin?: string;
 }
 
+export interface Panelist {
+  name: string;
+  role: string;
+  email?: string;
+  bio?: string;
+}
+
 export interface Semester {
   slug: string;
   title: string;
   year: string;
   description: string;
   members: Member[];
+  panelists: Panelist[];
 }
 
 export interface NoticeItem {
@@ -156,6 +164,12 @@ export const hallOfFameSemesters: Semester[] = [
     year: "2026",
     description: "A semester defined by bold exhibitions and community-led projects.",
     members: executiveMembers,
+    panelists: [
+      { name: "Arif Rahman", role: "President", email: "arif@example.com", bio: "Led the semester’s major exhibitions and partnerships." },
+      { name: "Mahir Kabir", role: "Vice President", email: "mahir@example.com", bio: "Coordinated event strategy and member growth." },
+      { name: "Shafa Islam", role: "General Secretary", email: "shafa@example.com", bio: "Managed communication, documentation, and club operations." },
+      { name: "Sajid Arefin", role: "Joint Secretary", email: "sajid@example.com", bio: "Supported logistics and volunteer management." },
+    ],
   },
   {
     slug: "fall-2025",
@@ -163,6 +177,12 @@ export const hallOfFameSemesters: Semester[] = [
     year: "2025",
     description: "A milestone year of workshops, outreach, and polished portfolio growth.",
     members: executiveMembers.slice(0, 4),
+    panelists: [
+      { name: "Nusrat Jahan", role: "President", email: "nusrat@example.com", bio: "Directed the semester’s workshop series and outreach." },
+      { name: "Farhan Uddin", role: "Vice President", email: "farhan@example.com", bio: "Led event planning and partnership development." },
+      { name: "Rifah Chowdhury", role: "General Secretary", email: "rifah@example.com", bio: "Oversaw club documentation and planning." },
+      { name: "Amina Hoque", role: "Joint Secretary", email: "amina@example.com", bio: "Managed member onboarding and volunteer coordination." },
+    ],
   },
   {
     slug: "spring-2025",
@@ -170,6 +190,12 @@ export const hallOfFameSemesters: Semester[] = [
     year: "2025",
     description: "Highlights from a high-energy year of collaboration and public showcases.",
     members: executiveMembers.slice(1, 5),
+    panelists: [
+      { name: "Farhan Uddin", role: "President", email: "farhan@example.com", bio: "Steered the semester’s community showcases." },
+      { name: "Shafa Islam", role: "Vice President", email: "shafa@example.com", bio: "Managed club events and member engagement." },
+      { name: "Arif Rahman", role: "General Secretary", email: "arif@example.com", bio: "Handled records, communications, and approvals." },
+      { name: "Tanzim Alam", role: "Joint Secretary", email: "tanzim@example.com", bio: "Supported event volunteers and execution." },
+    ],
   },
 ];
 

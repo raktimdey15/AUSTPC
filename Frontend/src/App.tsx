@@ -10,6 +10,7 @@ import HallOfFame from "./pages/HallofFame/hallOfFame";
 import UpcomingEventsPage from "./pages/UpcomingEvents/upcomingEvents";
 import NoticePage from "./pages/Notice/notice";
 import JoinPage from "./pages/Join/join";
+import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminPage from "./pages/Admin/admin";
 
 const router = createBrowserRouter([
@@ -28,7 +29,8 @@ const router = createBrowserRouter([
       { path: "upcoming-events", element: <UpcomingEventsPage /> },
       { path: "notice", element: <NoticePage /> },
       { path: "join", element: <JoinPage /> },
-      { path: "admin", element: <AdminPage /> },
+      { path: "admin", element: <AdminLogin /> },
+      { path: "admin/dashboard", element: <AdminPage /> },
     ],
   },
 ]);

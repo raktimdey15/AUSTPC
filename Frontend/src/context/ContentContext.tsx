@@ -26,72 +26,16 @@ export interface Applicant {
 }
 
 export interface SiteContentState {
-  hero: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    primaryButtonLabel: string;
-    secondaryButtonLabel: string;
-    slides: string[];
-  };
-  home: {
-    aboutTitle: string;
-    aboutDescription: string;
-    aboutPrimaryButtonLabel: string;
-    aboutSecondaryButtonLabel: string;
-    featuredTitle: string;
-    featuredDescription: string;
-    galleryTitle: string;
-    galleryDescription: string;
-    upcomingTitle: string;
-    upcomingDescription: string;
-    noticesTitle: string;
-    noticesDescription: string;
-    executiveTitle: string;
-    executiveDescription: string;
-    collaborationsTitle: string;
-    testimonialsTitle: string;
-  };
-  about: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  eventsPage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  executivePage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  subExecutivePage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  hallOfFamePage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  upcomingEventsPage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  noticePage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  joinPage: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
+  hero: { eyebrow: string; title: string; subtitle: string; primaryButtonLabel: string; secondaryButtonLabel: string; slides: string[]; };
+  home: { aboutTitle: string; aboutDescription: string; aboutPrimaryButtonLabel: string; aboutSecondaryButtonLabel: string; featuredTitle: string; featuredDescription: string; galleryTitle: string; galleryDescription: string; upcomingTitle: string; upcomingDescription: string; noticesTitle: string; noticesDescription: string; executiveTitle: string; executiveDescription: string; collaborationsTitle: string; testimonialsTitle: string; };
+  about: { eyebrow: string; title: string; description: string; };
+  eventsPage: { eyebrow: string; title: string; description: string; };
+  executivePage: { eyebrow: string; title: string; description: string; };
+  subExecutivePage: { eyebrow: string; title: string; description: string; };
+  hallOfFamePage: { eyebrow: string; title: string; description: string; };
+  upcomingEventsPage: { eyebrow: string; title: string; description: string; };
+  noticePage: { eyebrow: string; title: string; description: string; };
+  joinPage: { eyebrow: string; title: string; description: string; };
   stats: Array<{ value: string; label: string }>;
   testimonials: Array<{ quote: string; name: string; role: string }>;
   galleryHighlights: string[];
@@ -110,6 +54,7 @@ interface ContentContextValue {
   content: SiteContentState;
   setContent: React.Dispatch<React.SetStateAction<SiteContentState>>;
   addApplication: (application: Omit<Applicant, "id" | "submittedAt">) => void;
+  saveChanges: () => void;
 }
 
 const STORAGE_KEY = "austpc-content-v1";
@@ -121,7 +66,7 @@ const createInitialState = (): SiteContentState => ({
     subtitle: "Explore exhibitions, workshops, and a thriving creative community built around photography, design, and visual leadership.",
     primaryButtonLabel: "Explore Events",
     secondaryButtonLabel: "Join the Club",
-    slides: ["/src/assets/images/1.jpg", "/src/assets/images/2.jpg", "/src/assets/images/3.jpg"],
+    slides: ["/src/assets/Images/1.jpg", "/src/assets/Images/2.jpg", "/src/assets/Images/3.jpg"],
   },
   home: {
     aboutTitle: "Built for visual thinkers, storytellers, and future leaders.",
@@ -141,49 +86,17 @@ const createInitialState = (): SiteContentState => ({
     collaborationsTitle: "Partners who help shape the experience",
     testimonialsTitle: "Members speak about the experience",
   },
-  about: {
-    eyebrow: "About the Club",
-    title: "A creative community built on craft and curiosity",
-    description: "AUSTPC helps members grow through exhibitions, collaborations, and leadership-driven experiences.",
-  },
-  eventsPage: {
-    eyebrow: "Events",
-    title: "Curated experiences for every creative passion",
-    description: "Discover photography exhibitions, workshops, photowalks, contests, and seminars hosted by the club throughout the year.",
-  },
-  executivePage: {
-    eyebrow: "Executive Panel",
-    title: "A leadership structure built for impact",
-    description: "The executive board guides the club’s direction with professionalism, accountability, and a strong creative vision.",
-  },
-  subExecutivePage: {
-    eyebrow: "Sub Executive Panel",
-    title: "Dedicated contributors driving every initiative",
-    description: "The sub-executive team supports the club’s programming with energy, specialized skills, and consistent execution.",
-  },
-  hallOfFamePage: {
-    eyebrow: "Hall of Fame",
-    title: "Semesters preserved as milestones of excellence",
-    description: "Each semester page highlights the leadership, projects, and achievements that marked that chapter of the club.",
-  },
-  upcomingEventsPage: {
-    eyebrow: "Upcoming Events",
-    title: "Register early and secure your place",
-    description: "Planned gatherings, field sessions, and creative workshops for members and collaborators.",
-  },
-  noticePage: {
-    eyebrow: "Notice",
-    title: "Important updates for members and applicants",
-    description: "Stay informed with the latest announcements, deadlines, and club communications.",
-  },
-  joinPage: {
-    eyebrow: "Join AUSTPC",
-    title: "Apply to become a part of the club",
-    description: "Fill in your details and share your interests so the club can welcome you into its next chapter.",
-  },
+  about: { eyebrow: "About the Club", title: "A creative community built on craft and curiosity", description: "AUSTPC helps members grow through exhibitions, collaborations, and leadership-driven experiences.", },
+  eventsPage: { eyebrow: "Events", title: "Curated experiences for every creative passion", description: "Discover photography exhibitions, workshops, photowalks, contests, and seminars hosted by the club throughout the year.", },
+  executivePage: { eyebrow: "Executive Panel", title: "A leadership structure built for impact", description: "The executive board guides the club’s direction with professionalism, accountability, and a strong creative vision.", },
+  subExecutivePage: { eyebrow: "Sub Executive Panel", title: "Dedicated contributors driving every initiative", description: "The sub-executive team supports the club’s programming with energy, specialized skills, and consistent execution.", },
+  hallOfFamePage: { eyebrow: "Hall of Fame", title: "Semesters preserved as milestones of excellence", description: "Each semester page highlights the leadership, projects, and achievements that marked that chapter of the club.", },
+  upcomingEventsPage: { eyebrow: "Upcoming Events", title: "Register early and secure your place", description: "Planned gatherings, field sessions, and creative workshops for members and collaborators.", },
+  noticePage: { eyebrow: "Notice", title: "Important updates for members and applicants", description: "Stay informed with the latest announcements, deadlines, and club communications.", },
+  joinPage: { eyebrow: "Join AUSTPC", title: "Apply to become a part of the club", description: "Fill in your details and share your interests so the club can welcome you into its next chapter.", },
   stats: initialStats.map((item) => ({ ...item })),
   testimonials: initialTestimonials.map((item) => ({ ...item })),
-  galleryHighlights: initialGalleryHighlights.map((item) => item),
+  galleryHighlights: [...initialGalleryHighlights],
   featuredEvents: initialFeaturedEvents.map((item) => ({ ...item })),
   allEvents: initialAllEvents.map((item) => ({ ...item })),
   executiveMembers: initialExecutiveMembers.map((item) => ({ ...item })),
@@ -200,21 +113,12 @@ const createInitialState = (): SiteContentState => ({
 });
 
 const loadInitialState = () => {
-  if (typeof window === "undefined") {
-    return createInitialState();
-  }
-
+  if (typeof window === "undefined") return createInitialState();
   const saved = window.localStorage.getItem(STORAGE_KEY);
-  if (!saved) {
-    return createInitialState();
-  }
-
+  if (!saved) return createInitialState();
   try {
     const parsed = JSON.parse(saved) as SiteContentState;
-    return {
-      ...createInitialState(),
-      ...parsed,
-    };
+    return { ...createInitialState(), ...parsed };
   } catch {
     return createInitialState();
   }
@@ -225,31 +129,39 @@ const ContentContext = createContext<ContentContextValue | undefined>(undefined)
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContentState>(loadInitialState);
 
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-  }, [content]);
-
-  const addApplication = (application: Omit<Applicant, "id" | "submittedAt">) => {
-    setContent((prev) => ({
-      ...prev,
-      applications: [
-        {
-          ...application,
-          id: `${Date.now()}`,
-          submittedAt: new Date().toISOString(),
-        },
-        ...prev.applications,
-      ],
-    }));
+  const saveChanges = () => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+      alert("✅ Updates saved successfully! They will remain until you clear browser data.");
+    } catch (error) {
+      console.error("Storage Error:", error);
+      alert("❌ Save Failed: Local Storage is full. This usually happens if you used huge Base64 Image URLs. Please use short Image Links instead.");
+    }
   };
 
-  return <ContentContext.Provider value={{ content, setContent, addApplication }}>{children}</ContentContext.Provider>;
+  const addApplication = (application: Omit<Applicant, "id" | "submittedAt">) => {
+    setContent((prev) => {
+      const newState = {
+        ...prev,
+        applications: [
+          { ...application, id: `${Date.now()}`, submittedAt: new Date().toISOString() },
+          ...prev.applications,
+        ],
+      };
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      } catch (e) {
+        console.error("Could not auto-save application", e);
+      }
+      return newState;
+    });
+  };
+
+  return <ContentContext.Provider value={{ content, setContent, addApplication, saveChanges }}>{children}</ContentContext.Provider>;
 }
 
 export function useSiteContent() {
   const context = useContext(ContentContext);
-  if (!context) {
-    throw new Error("useSiteContent must be used within ContentProvider");
-  }
+  if (!context) throw new Error("useSiteContent must be used within ContentProvider");
   return context;
 }

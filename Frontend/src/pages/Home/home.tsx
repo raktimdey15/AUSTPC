@@ -64,7 +64,7 @@ function Home() {
           className="grid gap-10 rounded-[32px] border border-white/10 bg-zinc-900/70 p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-12"
         >
           <div>
-            <SectionTitle eyebrow="About the Club" title="Built for visual thinkers, storytellers, and future leaders." />
+            <SectionTitle eyebrow="About our Club" title="Built for visual thinkers, storytellers, and future leaders." />
             <p className="mt-6 text-lg leading-8 text-zinc-400">
               AUSTPC brings together ambitious students who want to sharpen their eye, grow through collaboration, and turn passion into visible impact.
             </p>

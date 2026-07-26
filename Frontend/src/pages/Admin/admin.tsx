@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "../../components/Common/PageHero";
 import { useSiteContent, type Applicant } from "../../context/ContentContext";
-import type { CollaborationItem, EventItem, Member, NoticeItem, Semester, UpcomingEventItem } from "../../data/siteContent";
+import type { EventItem, Member, NoticeItem, Semester, UpcomingEventItem } from "../../data/siteContent";
+import { saveSiteContent } from "../../utils/api";
 
 function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
   return (
@@ -98,6 +99,35 @@ function MemberEditor({ member, onChange, onRemove }: { member: Member; onChange
   );
 }
 
+function PanelistEditor({
+  panelist,
+  onChange,
+  onRemove,
+}: {
+  panelist: { name: string; role: string; email?: string; bio?: string };
+  onChange: (updated: { name: string; role: string; email?: string; bio?: string }) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="rounded-[20px] border border-white/10 bg-zinc-950/60 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h4 className="text-sm font-semibold text-white">{panelist.name || "New Panelist"}</h4>
+        <button type="button" onClick={onRemove} className="rounded-full border border-red-400/30 px-3 py-1 text-xs text-red-300 hover:bg-red-400/10">
+          Remove
+        </button>
+      </div>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <Field label="Name" value={panelist.name} onChange={(value) => onChange({ ...panelist, name: value })} />
+        <Field label="Role" value={panelist.role} onChange={(value) => onChange({ ...panelist, role: value })} />
+        <Field label="Email" value={panelist.email || ""} onChange={(value) => onChange({ ...panelist, email: value })} />
+        <div className="md:col-span-2">
+          <TextAreaField label="Bio" value={panelist.bio || ""} onChange={(value) => onChange({ ...panelist, bio: value })} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { content, setContent, addApplication, saveChanges } = useSiteContent();
   const navigate = useNavigate();
@@ -112,13 +142,26 @@ export default function AdminPage() {
       <p className="text-xs text-zinc-500">Note: File uploads require Phase 2 Cloudinary integration. Use URLs for now.</p>
       <button
         type="button"
-        onClick={saveChanges}
+        onClick={async () => {
+          try {
+            await saveSiteContent(content);
+            saveChanges();
+          } catch (error) {
+            console.error("Failed to save backend content:", error);
+            alert("Failed to save content to the backend.");
+          }
+        }}
         className="rounded-full bg-[#00FF66] px-8 py-3 text-sm font-bold text-black shadow-[0_0_15px_rgba(0,255,102,0.3)] transition hover:scale-105 hover:bg-white"
       >
         Finalize & Save Changes
       </button>
     </div>
   );
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("austpc_auth_token");
+    navigate("/admin");
+  };
 
   const updateHeroField = (key: keyof typeof content.hero, value: string) => setContent((prev) => ({ ...prev, hero: { ...prev.hero, [key]: value } }));
   const updateHomeField = (key: keyof typeof content.home, value: string) => setContent((prev) => ({ ...prev, home: { ...prev.home, [key]: value } }));
@@ -183,14 +226,6 @@ export default function AdminPage() {
   const addUpcoming = () => setContent((prev) => ({ ...prev, upcomingEventsList: [...prev.upcomingEventsList, { title: "New Event", description: "Details.", date: "TBD", venue: "TBD", poster: "" }] }));
   const removeUpcoming = (index: number) => setContent((prev) => ({ ...prev, upcomingEventsList: prev.upcomingEventsList.filter((_, i) => i !== index) }));
 
-  const updateCollaboration = (index: number, field: keyof CollaborationItem, value: string) => {
-    const next = [...content.collaborations];
-    next[index] = { ...next[index], [field]: value } as CollaborationItem;
-    setContent((prev) => ({ ...prev, collaborations: next }));
-  };
-  const addCollaboration = () => setContent((prev) => ({ ...prev, collaborations: [...prev.collaborations, { name: "New Partner", eventName: "New Event", type: "Collaboration", logo: "" }] }));
-  const removeCollaboration = (index: number) => setContent((prev) => ({ ...prev, collaborations: prev.collaborations.filter((_, i) => i !== index) }));
-
   const handleApplicationChange = (field: keyof typeof applicationForm, value: string) => setApplicationForm((prev) => ({ ...prev, [field]: value }));
   const handleApplicationSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -199,30 +234,41 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (sessionStorage.getItem("austpc_auth_token") !== "active") {
+    const token = sessionStorage.getItem("austpc_auth_token");
+    if (!token) {
       navigate("/admin");
     }
   }, [navigate]);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <div className="mx-auto max-w-7xl w-full flex justify-between items-center">
+      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-4">
         <PageHero
           eyebrow="Admin Dashboard"
           title="Content Management System"
           description="Update your website data here. Ensure you click 'Finalize & Save' to persist changes."
         />
-        <button 
-          onClick={() => {
-            if(confirm("Are you sure you want to reset all data to default? This will wipe your local saves.")) {
-              window.localStorage.removeItem("austpc-content-v1");
-              window.location.reload();
-            }
-          }}
-          className="ml-4 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20"
-        >
-          Reset Storage
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-full border border-white/10 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-300 transition hover:bg-white/5"
+          >
+            Logout
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Are you sure you want to reset all data to default? This will wipe your local saves.")) {
+                window.localStorage.removeItem("austpc-content-v1");
+                window.location.reload();
+              }
+            }}
+            className="rounded-full border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20"
+          >
+            Reset Storage
+          </button>
+        </div>
       </div>
 
       <div className="mx-auto max-w-7xl w-full flex flex-wrap gap-3">
@@ -406,20 +452,26 @@ export default function AdminPage() {
                   <div className="mt-6 space-y-3">
                     <h4 className="text-sm font-semibold text-[#00FF66]">Panelists</h4>
                     {semester.panelists.map((panelist, panelIndex) => (
-                      <div key={`pan-${panelIndex}`} className="rounded-[20px] border border-white/10 bg-zinc-950/60 p-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <Field label="Name" value={panelist.name} onChange={(value) => {
-                            const next = [...content.hallOfFameSemesters];
-                            next[index] = { ...next[index], panelists: next[index].panelists.map((item, i) => i === panelIndex ? { ...item, name: value } : item) };
-                            setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
-                          }} />
-                          <Field label="Role" value={panelist.role} onChange={(value) => {
-                            const next = [...content.hallOfFameSemesters];
-                            next[index] = { ...next[index], panelists: next[index].panelists.map((item, i) => i === panelIndex ? { ...item, role: value } : item) };
-                            setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
-                          }} />
-                        </div>
-                      </div>
+                      <PanelistEditor
+                        key={`pan-${panelIndex}`}
+                        panelist={panelist}
+                        onChange={(updated) => {
+                          const next = [...content.hallOfFameSemesters];
+                          next[index] = {
+                            ...next[index],
+                            panelists: next[index].panelists.map((item, i) => (i === panelIndex ? updated : item)),
+                          };
+                          setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                        }}
+                        onRemove={() => {
+                          const next = [...content.hallOfFameSemesters];
+                          next[index] = {
+                            ...next[index],
+                            panelists: next[index].panelists.filter((_, i) => i !== panelIndex),
+                          };
+                          setContent((prev) => ({ ...prev, hallOfFameSemesters: next }));
+                        }}
+                      />
                     ))}
                     <button type="button" onClick={() => {
                       const next = [...content.hallOfFameSemesters];

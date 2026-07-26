@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import type { ReactNode } from "react";
 
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home/home";
@@ -12,6 +13,14 @@ import NoticePage from "./pages/Notice/notice";
 import JoinPage from "./pages/Join/join";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminPage from "./pages/Admin/admin";
+
+function AdminRoute({ children }: { children: ReactNode }) {
+  if (typeof window !== "undefined" && sessionStorage.getItem("austpc_auth_token") === "active") {
+    return children;
+  }
+
+  return <Navigate to="/admin" replace />;
+}
 
 const router = createBrowserRouter([
   {
@@ -30,7 +39,14 @@ const router = createBrowserRouter([
       { path: "notice", element: <NoticePage /> },
       { path: "join", element: <JoinPage /> },
       { path: "admin", element: <AdminLogin /> },
-      { path: "admin/dashboard", element: <AdminPage /> },
+      {
+        path: "admin/dashboard",
+        element: (
+          <AdminRoute>
+            <AdminPage />
+          </AdminRoute>
+        ),
+      },
     ],
   },
 ]);

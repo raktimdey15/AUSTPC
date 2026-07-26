@@ -27,7 +27,7 @@ export default function ImageUploadField({ label, value, onChange, category = "g
       onChange(uploaded.url);
     } catch (uploadError) {
       console.error("Image upload failed:", uploadError);
-      setError("Upload failed. Please try again.");
+      setError("Upload failed. Check backend auth, storage config, and file type.");
     } finally {
       setIsUploading(false);
       // allow re-selecting the same file name later

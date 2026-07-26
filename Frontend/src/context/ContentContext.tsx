@@ -13,6 +13,7 @@ import {
   testimonials as initialTestimonials,
   upcomingEvents as initialUpcomingEvents,
 } from "../data/siteContent";
+import { api, submitApplication } from "../utils/api";
 
 export interface Applicant {
   id: string;
@@ -55,9 +56,19 @@ interface ContentContextValue {
   setContent: React.Dispatch<React.SetStateAction<SiteContentState>>;
   addApplication: (application: Omit<Applicant, "id" | "submittedAt">) => void;
   saveChanges: () => void;
+  isSyncedFromBackend: boolean;
 }
 
 const STORAGE_KEY = "austpc-content-v1";
+
+const normalizeSemester = (semester: Partial<Semester>): Semester => ({
+  slug: semester.slug ?? "",
+  title: semester.title ?? "",
+  year: semester.year ?? "",
+  description: semester.description ?? "",
+  members: Array.isArray(semester.members) ? semester.members.map((member) => ({ ...member })) : [],
+  panelists: Array.isArray(semester.panelists) ? semester.panelists.map((panelist) => ({ ...panelist })) : [],
+});
 
 const createInitialState = (): SiteContentState => ({
   hero: {
@@ -118,7 +129,13 @@ const loadInitialState = () => {
   if (!saved) return createInitialState();
   try {
     const parsed = JSON.parse(saved) as SiteContentState;
-    return { ...createInitialState(), ...parsed };
+    return {
+      ...createInitialState(),
+      ...parsed,
+      hallOfFameSemesters: Array.isArray(parsed.hallOfFameSemesters)
+        ? parsed.hallOfFameSemesters.map((semester) => normalizeSemester(semester as Partial<Semester>))
+        : createInitialState().hallOfFameSemesters,
+    };
   } catch {
     return createInitialState();
   }
@@ -128,6 +145,41 @@ const ContentContext = createContext<ContentContextValue | undefined>(undefined)
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContentState>(loadInitialState);
+  const [isSyncedFromBackend, setIsSyncedFromBackend] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncFromBackend = async () => {
+      try {
+        const { data } = await api.get("/content");
+        if (!isMounted || !data || typeof data !== "object") {
+          return;
+        }
+
+        const backendState = data as Partial<SiteContentState>;
+        const mergedState = {
+          ...createInitialState(),
+          ...backendState,
+          hallOfFameSemesters: Array.isArray(backendState.hallOfFameSemesters)
+            ? backendState.hallOfFameSemesters.map((semester) => normalizeSemester(semester as Partial<Semester>))
+            : createInitialState().hallOfFameSemesters,
+        } as SiteContentState;
+
+        setContent(mergedState);
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedState));
+        setIsSyncedFromBackend(true);
+      } catch (error) {
+        console.error("[content] backend sync failed, using local cache", error);
+      }
+    };
+
+    void syncFromBackend();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const saveChanges = () => {
     try {
@@ -140,6 +192,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addApplication = (application: Omit<Applicant, "id" | "submittedAt">) => {
+    void submitApplication(application).catch((error) => {
+      console.error("Could not save application to backend", error);
+    });
+
     setContent((prev) => {
       const newState = {
         ...prev,
@@ -157,7 +213,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  return <ContentContext.Provider value={{ content, setContent, addApplication, saveChanges }}>{children}</ContentContext.Provider>;
+  return <ContentContext.Provider value={{ content, setContent, addApplication, saveChanges, isSyncedFromBackend }}>{children}</ContentContext.Provider>;
 }
 
 export function useSiteContent() {

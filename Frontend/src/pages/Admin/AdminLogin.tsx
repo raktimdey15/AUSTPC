@@ -1,10 +1,7 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "../../components/Common/PageHero";
-
-// Phase 1 Secure Credentials
-const VALID_USERNAME = "austpc_admin";
-const VALID_PASSWORD = "Admin@2026!";
+import { adminLogin } from "../../utils/api";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -13,18 +10,17 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    if (username.trim() === VALID_USERNAME && password === VALID_PASSWORD) {
-      sessionStorage.setItem("austpc_auth_token", "active");
+    try {
+      const response = await adminLogin(username, password);
+      sessionStorage.setItem("austpc_auth_token", response.token);
       navigate("/admin/dashboard");
-    } else {
+    } catch (loginError) {
+      console.error("Admin login failed:", loginError);
       setError("Unauthorized access. Invalid username or password.");
       setIsLoading(false);
     }

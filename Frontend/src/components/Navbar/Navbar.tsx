@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../assets/icon/austpc.png";
+import { useSiteContent } from "../../context/ContentContext";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -15,15 +16,15 @@ const navItems = [
   { to: "/join", label: "Join" },
 ];
 
-const hallOfFameItems = [
-  { to: "/hall-of-fame/spring-2026", label: "Spring 2026" },
-  { to: "/hall-of-fame/fall-2025", label: "Fall 2025" },
-  { to: "/hall-of-fame/spring-2025", label: "Spring 2025" },
-];
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [hallOfFameOpen, setHallOfFameOpen] = useState(false);
+  const { content } = useSiteContent();
+
+  const hallOfFameItems = [...content.hallOfFameSemesters]
+    .sort((left, right) => right.year.localeCompare(left.year) || right.title.localeCompare(left.title))
+    .slice(0, 3)
+    .map((semester) => ({ to: `/hall-of-fame/${semester.slug}`, label: semester.title }));
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">

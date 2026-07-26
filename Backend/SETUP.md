@@ -10,12 +10,17 @@
    ```
 2. `cd Backend && npm install`
 3. Copy `.env.example` to `.env` and fill in:
+   - `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` or `ADMIN_PASSWORD`, and `ADMIN_TOKEN_SECRET` for admin login
    - `MONGODB_URI` — your local/Atlas MongoDB connection string
    - `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME` — your S3 (or R2/MinIO) credentials
    - Make your S3 bucket public-read for the objects you upload (or front it with CloudFront) so the stored `url` is directly viewable.
 4. `npm run dev` — starts the API on `http://localhost:5000`.
 
 Endpoints:
+- `POST /api/auth/login` — admin login, returns a signed token
+- `GET /api/content` — site content snapshot for the frontend
+- `PUT /api/content` — save site content (admin token required)
+- `POST /api/content/applications` — public join-form submission storage
 - `POST /api/uploads` — multipart field `image` (+ optional `category`) → `{ id, url, category }`
 - `GET /api/uploads?category=gallery` — list uploads
 - `DELETE /api/uploads/:id` — removes from S3 + MongoDB

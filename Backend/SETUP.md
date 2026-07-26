@@ -20,6 +20,8 @@ Endpoints:
 - `POST /api/auth/login` — admin login, returns a signed token
 - `GET /api/content` — site content snapshot for the frontend
 - `PUT /api/content` — save site content (admin token required)
+- `GET /api/sections/:section` — fetch one content section
+- `PUT /api/sections/:section` — update one content section (admin token required)
 - `POST /api/content/applications` — public join-form submission storage
 - `POST /api/uploads` — multipart field `image` (+ optional `category`) → `{ id, url, category }`
 - `GET /api/uploads?category=gallery` — list uploads

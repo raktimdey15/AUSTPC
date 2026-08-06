@@ -11,7 +11,7 @@ export default function UpcomingEventsPage() {
         description={content.upcomingEventsPage.description}
       />
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 text-center lg:grid-cols-2">
         {content.upcomingEventsList.map((event) => (
           <div key={event.title} className="overflow-hidden rounded-[28px] border border-white/10 bg-zinc-900/80">
             <img src={event.poster} alt={event.title} className="h-56 w-full object-cover" />

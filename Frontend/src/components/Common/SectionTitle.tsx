@@ -9,7 +9,7 @@ export default function SectionTitle({
   eyebrow,
   title,
   description,
-  center = false,
+  center = true,
 }: SectionTitleProps) {
   return (
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>

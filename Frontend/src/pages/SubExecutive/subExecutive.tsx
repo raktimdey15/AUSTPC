@@ -11,7 +11,7 @@ export default function SubExecutive() {
         description={content.subExecutivePage.description}
       />
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-6 text-center md:grid-cols-2 xl:grid-cols-4">
         {content.subExecutiveMembers.map((member) => (
           <div key={member.name} className="rounded-[24px] border border-white/10 bg-zinc-900/80 p-4">
             <img src={member.photo} alt={member.name} className="h-48 w-full rounded-[20px] object-cover" />

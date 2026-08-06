@@ -1,8 +1,12 @@
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
-});
+// In production the backend serves this bundle, so the API is same-origin.
+// In dev the Vite server runs on :5173 while the API runs on :5000.
+// VITE_API_BASE_URL overrides both (needed if you deploy them separately).
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "/api");
+
+export const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
@@ -40,6 +44,12 @@ export interface ApplicationPayload {
   skills: string;
 }
 
+export interface ApplicationRecord extends ApplicationPayload {
+  id: string;
+  status: "pending" | "reviewed" | "accepted" | "rejected";
+  submittedAt: string;
+}
+
 export async function adminLogin(username: string, password: string): Promise<AdminLoginResponse> {
   const { data } = await api.post<AdminLoginResponse>("/auth/login", { username, password });
   return data;
@@ -50,7 +60,17 @@ export async function saveSiteContent(state: unknown): Promise<void> {
 }
 
 export async function submitApplication(application: ApplicationPayload): Promise<void> {
-  await api.post("/content/applications", application);
+  await api.post("/applications", application);
+}
+
+// Admin-only: applications live in their own collection, never in public content.
+export async function fetchApplications(): Promise<ApplicationRecord[]> {
+  const { data } = await api.get<{ applications: ApplicationRecord[] }>("/applications");
+  return data.applications;
+}
+
+export async function deleteApplication(id: string): Promise<void> {
+  await api.delete(`/applications/${id}`);
 }
 
 export async function uploadImage(file: File, category = "general"): Promise<UploadedImage> {

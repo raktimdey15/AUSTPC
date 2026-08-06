@@ -1,19 +1,27 @@
 import { S3Client } from "@aws-sdk/client-s3";
+import { env } from "./env.js";
 
-const isCustomEndpoint = Boolean(process.env.S3_ENDPOINT);
+let client = null;
 
-export const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-  ...(isCustomEndpoint
-    ? {
-        endpoint: process.env.S3_ENDPOINT,
-        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
-      }
-    : {}),
-});
+// Lazy singleton: the client is only constructed when S3 is actually used,
+// so a local-storage dev setup never needs AWS credentials.
+export function getS3Client() {
+  if (!client) {
+    client = new S3Client({
+      region: env.s3.region || "us-east-1",
+      credentials: {
+        accessKeyId: env.s3.accessKeyId,
+        secretAccessKey: env.s3.secretAccessKey,
+      },
+      ...(env.s3.endpoint
+        ? {
+            endpoint: env.s3.endpoint,
+            forcePathStyle: env.s3.forcePathStyle,
+          }
+        : {}),
+    });
+  }
+  return client;
+}
 
-export const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+export const BUCKET_NAME = env.s3.bucketName;

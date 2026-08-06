@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload } from "../middleware/upload.js";
+import { upload, handleUploadErrors } from "../middleware/upload.js";
 import { requireAdminAuth } from "../middleware/adminAuth.js";
 import { createUpload, listUploads, deleteUpload } from "../controllers/uploadController.js";
 
@@ -13,5 +13,7 @@ router.get("/", listUploads);
 
 // DELETE /api/uploads/:id
 router.delete("/:id", requireAdminAuth, deleteUpload);
+
+router.use(handleUploadErrors);
 
 export default router;

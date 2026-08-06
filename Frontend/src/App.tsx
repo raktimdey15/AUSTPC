@@ -15,7 +15,7 @@ import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminPage from "./pages/Admin/admin";
 
 function AdminRoute({ children }: { children: ReactNode }) {
-  if (typeof window !== "undefined" && sessionStorage.getItem("austpc_auth_token") === "active") {
+  if (typeof window !== "undefined" && sessionStorage.getItem("austpc_auth_token")) {
     return children;
   }
 

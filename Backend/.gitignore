@@ -1,2 +1,8 @@
 node_modules
 .env
+
+# Local development database (created by `npm run db`)
+data/
+
+# Locally stored uploads (created when STORAGE_DRIVER resolves to local)
+uploads/

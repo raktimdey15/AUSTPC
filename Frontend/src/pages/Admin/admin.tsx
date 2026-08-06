@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "../../components/Common/PageHero";
+import ImageUploadField from "../../components/Common/ImageUploadField";
 import { useSiteContent, type Applicant } from "../../context/ContentContext";
 import type { EventItem, Member, NoticeItem, Semester, UpcomingEventItem } from "../../data/siteContent";
-import { saveSiteContent } from "../../utils/api";
+import { deleteApplication, fetchApplications, saveSiteContent } from "../../utils/api";
 
 function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
   return (
@@ -33,25 +34,6 @@ function TextAreaField({ label, value, onChange }: { label: string; value: strin
   );
 }
 
-// Phase 1 Image Field: Strictly URL/Path based to prevent LocalStorage crashing
-function ImageUploadField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label className="flex flex-col gap-2 text-sm text-zinc-300">
-      <span className="flex justify-between">
-        {label}
-        <span className="text-xs text-zinc-500">Paste URL or Local Path (e.g., /src/assets/image.jpg)</span>
-      </span>
-      <input
-        type="text"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="https://... or /src/assets/..."
-        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-[#00FF66] transition-colors"
-      />
-    </label>
-  );
-}
-
 function EventEditor({ event, onChange, onRemove }: { event: EventItem; onChange: (updated: EventItem) => void; onRemove: () => void }) {
   return (
     <div className="rounded-[24px] border border-white/10 bg-black/30 p-5">
@@ -72,7 +54,7 @@ function EventEditor({ event, onChange, onRemove }: { event: EventItem; onChange
         <TextAreaField label="Short Description" value={event.description} onChange={(value) => onChange({ ...event, description: value })} />
         <TextAreaField label="Long Description" value={event.longDescription} onChange={(value) => onChange({ ...event, longDescription: value })} />
         <div className="md:col-span-2">
-          <ImageUploadField label="Event Image URL" value={event.image} onChange={(value) => onChange({ ...event, image: value })} />
+          <ImageUploadField label="Event Image" category="event" value={event.image} onChange={(value) => onChange({ ...event, image: value })} />
         </div>
       </div>
     </div>
@@ -92,7 +74,7 @@ function MemberEditor({ member, onChange, onRemove }: { member: Member; onChange
         <Field label="Facebook URL" value={member.facebook || ""} onChange={(value) => onChange({ ...member, facebook: value })} />
         <Field label="LinkedIn URL" value={member.linkedin || ""} onChange={(value) => onChange({ ...member, linkedin: value })} />
         <div className="md:col-span-2">
-          <ImageUploadField label="Photo URL" value={member.photo} onChange={(value) => onChange({ ...member, photo: value })} />
+          <ImageUploadField label="Photo" category="member" value={member.photo} onChange={(value) => onChange({ ...member, photo: value })} />
         </div>
       </div>
     </div>
@@ -139,7 +121,7 @@ export default function AdminPage() {
 
   const FinalizeUpdatesButton = () => (
     <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
-      <p className="text-xs text-zinc-500">Note: File uploads require Phase 2 Cloudinary integration. Use URLs for now.</p>
+      <p className="text-xs text-zinc-500">Images can be uploaded directly (stored by the backend) or referenced by URL.</p>
       <button
         type="button"
         onClick={async () => {
@@ -237,8 +219,34 @@ export default function AdminPage() {
     const token = sessionStorage.getItem("austpc_auth_token");
     if (!token) {
       navigate("/admin");
+      return;
     }
-  }, [navigate]);
+
+    // Applications live in their own admin-only collection on the backend.
+    let cancelled = false;
+    fetchApplications()
+      .then((applications) => {
+        if (!cancelled) {
+          setContent((prev) => ({ ...prev, applications }));
+        }
+      })
+      .catch((error) => console.error("Could not load applications from backend:", error));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, setContent]);
+
+  const handleDeleteApplication = async (id: string) => {
+    if (!confirm("Delete this application permanently?")) return;
+    try {
+      await deleteApplication(id);
+      setContent((prev) => ({ ...prev, applications: prev.applications.filter((application) => application.id !== id) }));
+    } catch (error) {
+      console.error("Failed to delete application:", error);
+      alert("Failed to delete the application on the server.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -302,7 +310,7 @@ export default function AdminPage() {
                       <button type="button" onClick={() => setContent((prev) => ({ ...prev, hero: { ...prev.hero, slides: prev.hero.slides.filter((_, i) => i !== index) } }))} className="rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300 hover:bg-red-400/10">Remove</button>
                     </div>
                     <div className="mt-4">
-                      <ImageUploadField label="Hero Image URL" value={slide} onChange={(value) => setContent((prev) => ({ ...prev, hero: { ...prev.hero, slides: prev.hero.slides.map((item, i) => (i === index ? value : item)) } }))} />
+                      <ImageUploadField label="Hero Image" category="hero" value={slide} onChange={(value) => setContent((prev) => ({ ...prev, hero: { ...prev.hero, slides: prev.hero.slides.map((item, i) => (i === index ? value : item)) } }))} />
                     </div>
                   </div>
                 ))}
@@ -363,7 +371,7 @@ export default function AdminPage() {
                 <h3 className="text-lg font-semibold text-white">Gallery Highlights</h3>
                 {content.galleryHighlights.map((image, index) => (
                   <div key={`gal-${index}`} className="rounded-[24px] border border-white/10 bg-black/30 p-4">
-                    <ImageUploadField label={`Gallery Image ${index + 1}`} value={image} onChange={(value) => updateGallery(index, value)} />
+                    <ImageUploadField label={`Gallery Image ${index + 1}`} category="gallery" value={image} onChange={(value) => updateGallery(index, value)} />
                     <button type="button" onClick={() => removeGalleryImage(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300 hover:bg-red-400/10">Remove</button>
                   </div>
                 ))}
@@ -512,7 +520,7 @@ export default function AdminPage() {
                     <Field label="Title" value={event.title} onChange={(value) => updateUpcoming(index, "title", value)} />
                     <Field label="Date" value={event.date} onChange={(value) => updateUpcoming(index, "date", value)} />
                     <div className="md:col-span-2"><TextAreaField label="Description" value={event.description} onChange={(value) => updateUpcoming(index, "description", value)} /></div>
-                    <div className="md:col-span-2"><ImageUploadField label="Poster URL" value={event.poster} onChange={(value) => updateUpcoming(index, "poster", value)} /></div>
+                    <div className="md:col-span-2"><ImageUploadField label="Poster" category="event" value={event.poster} onChange={(value) => updateUpcoming(index, "poster", value)} /></div>
                   </div>
                   <button type="button" onClick={() => removeUpcoming(index)} className="mt-4 rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300">Remove</button>
                 </div>
@@ -542,11 +550,25 @@ export default function AdminPage() {
                   <div key={application.id} className="rounded-[24px] border border-[#00FF66]/20 bg-black/50 p-6 shadow-lg">
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                       <h3 className="text-xl font-bold text-white">{application.name}</h3>
-                      <span className="text-sm font-medium text-[#00FF66]">{new Date(application.submittedAt).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-[#00FF66]">{new Date(application.submittedAt).toLocaleDateString()}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteApplication(application.id)}
+                          className="rounded-full border border-red-400/30 px-3 py-1 text-sm text-red-300 hover:bg-red-400/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                     <div className="mt-4 grid gap-3 text-sm text-zinc-300 md:grid-cols-2">
                       <p><span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Dept</span> {application.department}</p>
                       <p><span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Email</span> {application.email}</p>
+                      <p><span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Semester</span> {application.semester || "—"}</p>
+                      <p><span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Phone</span> {application.phone || "—"}</p>
+                      {application.skills ? (
+                        <p className="md:col-span-2"><span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Skills</span> {application.skills}</p>
+                      ) : null}
                     </div>
                   </div>
                 ))

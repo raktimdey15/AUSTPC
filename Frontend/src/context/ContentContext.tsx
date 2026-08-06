@@ -77,7 +77,7 @@ const createInitialState = (): SiteContentState => ({
     subtitle: "Explore exhibitions, workshops, and a thriving creative community built around photography, design, and visual leadership.",
     primaryButtonLabel: "Explore Events",
     secondaryButtonLabel: "Join the Club",
-    slides: ["/src/assets/Images/1.jpg", "/src/assets/Images/2.jpg", "/src/assets/Images/3.jpg"],
+    slides: ["/images/1.jpg", "/images/2.jpg", "/images/3.jpg"],
   },
   home: {
     aboutTitle: "Built for visual thinkers, storytellers, and future leaders.",
@@ -184,10 +184,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const saveChanges = () => {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-      alert("✅ Updates saved successfully! They will remain until you clear browser data.");
+      alert("✅ Updates saved to the server. Visitors will now see the new content.");
     } catch (error) {
       console.error("Storage Error:", error);
-      alert("❌ Save Failed: Local Storage is full. This usually happens if you used huge Base64 Image URLs. Please use short Image Links instead.");
+      alert("⚠️ Saved to the server, but the local cache is full. Use uploaded/linked images instead of Base64 URLs.");
     }
   };
 

@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import { env } from "./env.js";
 
 export async function connectDB() {
-  const uri = process.env.MONGODB_URI;
+  const uri = env.mongodbUri;
 
   if (!uri) {
     throw new Error("MONGODB_URI is not set in .env");
@@ -15,5 +16,15 @@ export async function connectDB() {
     console.error("[db] MongoDB connection error:", err.message);
   });
 
-  await mongoose.connect(uri);
+  mongoose.connection.on("disconnected", () => {
+    console.warn("[db] MongoDB disconnected");
+  });
+
+  await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 10_000,
+  });
+}
+
+export async function disconnectDB() {
+  await mongoose.disconnect();
 }

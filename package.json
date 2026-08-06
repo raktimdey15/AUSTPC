@@ -1,10 +1,18 @@
 {
-  "dependencies": {
-    "@tailwindcss/vite": "^4.3.2",
-    "axios": "^1.18.1",
-    "framer-motion": "^12.42.2",
-    "react-icons": "^5.7.0",
-    "react-router-dom": "^7.18.1",
-    "tailwindcss": "^4.3.2"
+  "name": "austpc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AUSTPC website - React frontend served by an Express/MongoDB backend",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm ci --omit=dev --prefix Backend && npm ci --include=dev --prefix Frontend && npm run build --prefix Frontend",
+    "start": "node Backend/server.js",
+    "seed": "npm run seed --prefix Backend",
+    "dev:db": "npm run db --prefix Backend",
+    "dev:api": "npm run dev --prefix Backend",
+    "dev:web": "npm run dev --prefix Frontend",
+    "setup": "npm ci --prefix Backend && npm ci --prefix Frontend"
   }
 }

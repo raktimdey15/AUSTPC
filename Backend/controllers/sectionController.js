@@ -1,48 +1,24 @@
-import { getOrCreateContentDocument, updateContentDocument } from "../services/contentService.js";
+import { getOrCreateContentDocument, getPublicContentState, updateContentDocument } from "../services/contentService.js";
+import { isKnownSection } from "../config/contentSections.js";
 
-const SECTION_ALLOWLIST = new Set([
-  "hero",
-  "home",
-  "about",
-  "eventsPage",
-  "executivePage",
-  "subExecutivePage",
-  "hallOfFamePage",
-  "upcomingEventsPage",
-  "noticePage",
-  "joinPage",
-  "stats",
-  "testimonials",
-  "galleryHighlights",
-  "featuredEvents",
-  "allEvents",
-  "executiveMembers",
-  "subExecutiveMembers",
-  "hallOfFameSemesters",
-  "notices",
-  "upcomingEventsList",
-  "collaborations",
-  "applications",
-]);
-
-export async function getSection(req, res) {
+export async function getSection(req, res, next) {
   try {
     const { section } = req.params;
-    if (!SECTION_ALLOWLIST.has(section)) {
+    if (!isKnownSection(section)) {
       return res.status(404).json({ message: "Unknown section" });
     }
 
     const document = await getOrCreateContentDocument();
     return res.json({ section, value: document.state?.[section] ?? null });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to load section", error: error.message });
+    return next(error);
   }
 }
 
-export async function updateSection(req, res) {
+export async function updateSection(req, res, next) {
   try {
     const { section } = req.params;
-    if (!SECTION_ALLOWLIST.has(section)) {
+    if (!isKnownSection(section)) {
       return res.status(404).json({ message: "Unknown section" });
     }
 
@@ -54,15 +30,15 @@ export async function updateSection(req, res) {
 
     return res.json({ section, value: document.state?.[section] ?? null });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to update section", error: error.message });
+    return next(error);
   }
 }
 
-export async function getContentSnapshot(_req, res) {
+export async function getContentSnapshot(_req, res, next) {
   try {
-    const document = await getOrCreateContentDocument();
-    return res.json({ state: document.state || {}, updatedAt: document.updatedAt || null });
+    const snapshot = await getPublicContentState();
+    return res.json(snapshot);
   } catch (error) {
-    return res.status(500).json({ message: "Failed to load content snapshot", error: error.message });
+    return next(error);
   }
 }

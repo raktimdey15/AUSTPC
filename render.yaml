@@ -1,0 +1,71 @@
+# Render Blueprint — one web service that runs the API and serves the built React site.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# The database is NOT defined here: Render's managed offering is PostgreSQL, and
+# this app uses MongoDB. Create a free MongoDB Atlas cluster and paste its
+# connection string into the MONGODB_URI variable (see DEPLOYMENT.md).
+
+services:
+  - type: web
+    name: austpc
+    runtime: node
+    plan: free
+    # Closest region to Bangladesh. Others: oregon, ohio, virginia, frankfurt.
+    region: singapore
+
+    # --include=dev for the Frontend is required: Render sets NODE_ENV=production,
+    # which makes npm skip devDependencies — and vite/typescript live there.
+    # --omit=dev for the Backend keeps mongodb-memory-server (a dev-only helper
+    # that downloads a mongod binary) out of the deployment.
+    buildCommand: npm run build
+    startCommand: npm start
+
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVE_FRONTEND
+        value: "true"
+      # Render terminates TLS at its proxy; this makes rate limiting see real client IPs.
+      - key: TRUST_PROXY
+        value: "true"
+      # Render generates a strong random value once and keeps it across deploys.
+      - key: ADMIN_TOKEN_SECRET
+        generateValue: true
+      - key: ADMIN_TOKEN_TTL_SECONDS
+        value: "28800"
+
+      # ── Set these in the Render dashboard (sync: false = never stored in git) ──
+      # MongoDB Atlas SRV connection string, ending in /austpc
+      - key: MONGODB_URI
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      # SHA-256 hex hash of your admin password — see DEPLOYMENT.md for the command.
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      # Your public site URL, e.g. https://austpc.onrender.com
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+
+      # ── Image storage ────────────────────────────────────────────────────────
+      # IMPORTANT: Render's free plan has an ephemeral filesystem — locally stored
+      # uploads are LOST on every deploy and on every wake from sleep. Set these to
+      # keep uploads permanently (Cloudflare R2 has a free tier and is S3-compatible).
+      - key: STORAGE_DRIVER
+        value: auto
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET_NAME
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_FORCE_PATH_STYLE
+        sync: false

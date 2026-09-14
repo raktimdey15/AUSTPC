@@ -1,0 +1,11 @@
+﻿.env
+.env.*
+node_modules/
+dist/
+build/
+*.log
+supabase/.temp/
+Backend/node_modules/
+Frontend/node_modules/
+Backend/.env
+Frontend/.env

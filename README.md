@@ -102,5 +102,5 @@ Contributions, issues, and feature requests are welcome!
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the AUSTPC Web Development Team</p>
+  <p>Built by Raktim Dey (EEE, AUST | Joint Secretary, AUSTPC)</p>
 </div>
